@@ -106,13 +106,24 @@
             color: #333;
         }
         tr:hover { background: #f8f9fa; }
+        .actions { white-space: nowrap; }
         .actions a {
-            margin-right: 10px;
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
             text-decoration: none;
-            color: #007bff;
+            font-size: 18px;
+            border-radius: 4px;
+            margin-right: 5px;
+            transition: all 0.2s;
         }
-        .actions a:hover { text-decoration: underline; }
+        .actions a:hover {
+            background: #e9ecef;
+        }
         .actions a.delete { color: #dc3545; }
+        .actions a.delete:hover { background: #f8d7da; }
         .total {
             margin-top: 15px;
             color: #666;
@@ -132,7 +143,6 @@
         <!-- Navigation -->
         <div class="nav">
             <a href="<%=request.getContextPath()%>/player?action=list" class="active">Players</a>
-            <a href="<%=request.getContextPath()%>/playerindex?action=list">Player Indexes</a>
         </div>
 
         <!-- Messages -->
@@ -186,10 +196,9 @@
                     <td><%= player.getIndexerName() != null ? player.getIndexerName() : "-" %></td>
                     <td><%= player.getIndexValue() != null ? player.getIndexValue() : "-" %></td>
                     <td class="actions">
-                        <a href="<%=request.getContextPath()%>/player?action=edit&id=<%= player.getPlayerId() %>">Edit</a>
-                        <a href="<%=request.getContextPath()%>/playerindex?action=byPlayer&playerId=<%= player.getPlayerId() %>">Indexes</a>
+                        <a href="<%=request.getContextPath()%>/player?action=edit&id=<%= player.getPlayerId() %>" title="Edit">&#9998;</a>
                         <a href="<%=request.getContextPath()%>/player?action=delete&id=<%= player.getPlayerId() %>"
-                           class="delete" onclick="return confirm('Are you sure you want to delete this player?');">Delete</a>
+                           class="delete" title="Delete" onclick="return confirm('Are you sure you want to delete this player?');">&#128465;</a>
                     </td>
                 </tr>
                 <%
