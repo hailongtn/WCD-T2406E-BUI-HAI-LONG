@@ -1,27 +1,17 @@
 package com.example.wcdf.model;
 
-/**
- * Entity class representing a Player
- * Maps to the 'player' table in database
- */
 public class Player {
     private int playerId;
     private String name;
     private String fullName;
     private int age;
-    private Integer indexId;  // Foreign key to indexer table (nullable)
-
-    // For display purposes - joined from indexer table
+    private Integer indexId;
     private String indexerName;
-
-    // For display purposes - value from player_index table
     private Integer indexValue;
 
-    // Default constructor
     public Player() {
     }
 
-    // Parameterized constructor
     public Player(int playerId, String name, String fullName, int age, Integer indexId) {
         this.playerId = playerId;
         this.name = name;
@@ -30,7 +20,6 @@ public class Player {
         this.indexId = indexId;
     }
 
-    // Getters and Setters
     public int getPlayerId() {
         return playerId;
     }
@@ -98,4 +87,3 @@ public class Player {
                 '}';
     }
 }
-

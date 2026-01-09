@@ -140,12 +140,10 @@
     <div class="container">
         <h2>Player Evaluation System</h2>
 
-        <!-- Navigation -->
         <div class="nav">
             <a href="<%=request.getContextPath()%>/player?action=list" class="active">Players</a>
         </div>
 
-        <!-- Messages -->
         <% String successMsg = (String) session.getAttribute("successMessage"); %>
         <% String errorMsg = (String) session.getAttribute("errorMessage"); %>
         <% if (successMsg != null) { %>
@@ -157,7 +155,6 @@
             <% session.removeAttribute("errorMessage"); %>
         <% } %>
 
-        <!-- Toolbar -->
         <div class="toolbar">
             <a href="<%=request.getContextPath()%>/player?action=new" class="btn">+ Add New Player</a>
 
@@ -171,7 +168,6 @@
             </form>
         </div>
 
-        <!-- Player Table -->
         <table>
             <thead>
                 <tr>

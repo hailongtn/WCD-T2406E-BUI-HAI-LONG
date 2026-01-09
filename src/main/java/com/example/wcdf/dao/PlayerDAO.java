@@ -7,16 +7,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for Player entity
- * Handles all CRUD operations for the player table
- */
 public class PlayerDAO {
 
-    /**
-     * Get all players with indexer name and value (LEFT JOIN)
-     * @return List of all Player objects
-     */
     public List<Player> findAll() {
         List<Player> players = new ArrayList<>();
         String sql = "SELECT p.player_id, p.name, p.full_name, p.age, p.index_id, " +
@@ -40,11 +32,6 @@ public class PlayerDAO {
         return players;
     }
 
-    /**
-     * Find player by ID
-     * @param playerId Player ID to find
-     * @return Player object or null if not found
-     */
     public Player findById(int playerId) {
         String sql = "SELECT p.player_id, p.name, p.full_name, p.age, p.index_id, " +
                      "i.name AS indexer_name, pi.value AS index_value " +
@@ -69,11 +56,6 @@ public class PlayerDAO {
         return null;
     }
 
-    /**
-     * Search players by name
-     * @param searchName Name pattern to search
-     * @return List of matching players
-     */
     public List<Player> findByName(String searchName) {
         List<Player> players = new ArrayList<>();
         String sql = "SELECT p.player_id, p.name, p.full_name, p.age, p.index_id, " +
@@ -102,11 +84,6 @@ public class PlayerDAO {
         return players;
     }
 
-    /**
-     * Insert new player
-     * @param player Player to insert
-     * @return Generated ID or -1 if failed
-     */
     public int insert(Player player) {
         String sql = "INSERT INTO player (name, full_name, age, index_id) VALUES (?, ?, ?, ?)";
 
@@ -138,11 +115,6 @@ public class PlayerDAO {
         return -1;
     }
 
-    /**
-     * Update existing player
-     * @param player Player to update
-     * @return true if successful
-     */
     public boolean update(Player player) {
         String sql = "UPDATE player SET name = ?, full_name = ?, age = ?, index_id = ? " +
                      "WHERE player_id = ?";
@@ -169,11 +141,6 @@ public class PlayerDAO {
         return false;
     }
 
-    /**
-     * Delete player by ID
-     * @param playerId ID of player to delete
-     * @return true if successful
-     */
     public boolean delete(int playerId) {
         String sql = "DELETE FROM player WHERE player_id = ?";
 
@@ -188,12 +155,6 @@ public class PlayerDAO {
         return false;
     }
 
-    /**
-     * Map ResultSet row to Player object
-     * @param rs ResultSet to map
-     * @return Player object
-     * @throws SQLException if mapping fails
-     */
     private Player mapResultSetToPlayer(ResultSet rs) throws SQLException {
         Player player = new Player();
         player.setPlayerId(rs.getInt("player_id"));
@@ -208,17 +169,14 @@ public class PlayerDAO {
 
         player.setIndexerName(rs.getString("indexer_name"));
 
-        // Map index value if exists
         try {
             int indexValue = rs.getInt("index_value");
             if (!rs.wasNull()) {
                 player.setIndexValue(indexValue);
             }
         } catch (SQLException e) {
-            // Column might not exist in some queries
         }
 
         return player;
     }
 }
-

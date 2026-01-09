@@ -17,10 +17,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Servlet Controller for Player CRUD operations
- * Handles: list, add, edit, update, delete
- */
 @WebServlet(name = "PlayerServlet", urlPatterns = {"/player", "/player/*"})
 public class PlayerServlet extends HttpServlet {
 
@@ -96,23 +92,15 @@ public class PlayerServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Display list of all players
-     */
     private void listPlayers(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         List<Player> players = playerDAO.findAll();
         request.setAttribute("players", players);
         request.getRequestDispatcher("/WEB-INF/views/player/list.jsp").forward(request, response);
     }
 
-    /**
-     * Search players by name
-     */
     private void searchPlayers(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         String searchName = request.getParameter("searchName");
         List<Player> players;
 
@@ -127,23 +115,15 @@ public class PlayerServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/player/list.jsp").forward(request, response);
     }
 
-    /**
-     * Show form for new player
-     */
     private void showNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         List<Indexer> indexers = indexerDAO.findAll();
         request.setAttribute("indexers", indexers);
         request.getRequestDispatcher("/WEB-INF/views/player/form.jsp").forward(request, response);
     }
 
-    /**
-     * Show form for editing existing player
-     */
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         int playerId = ValidationUtil.parseIntSafe(request.getParameter("id"), 0);
 
         if (playerId <= 0) {
@@ -166,29 +146,20 @@ public class PlayerServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/player/form.jsp").forward(request, response);
     }
 
-    /**
-     * Insert new player with validation
-     */
     private void insertPlayer(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Extract form data
         Player player = extractPlayerFromRequest(request);
 
-        // Get index value from form
         int indexValue = ValidationUtil.parseIntSafe(request.getParameter("indexValue"), 0);
         player.setIndexValue(indexValue > 0 ? indexValue : null);
 
-        // Server-side validation
         List<String> errors = ValidationUtil.validatePlayer(player);
 
-        // Validate age is numeric (additional check)
         String ageStr = request.getParameter("age");
         if (!ValidationUtil.isValidInteger(ageStr)) {
             errors.add("Age must be a valid number");
         }
 
-        // Validate index value if index is selected
         if (player.getIndexId() != null && player.getIndexId() > 0) {
             Indexer indexer = indexerDAO.findById(player.getIndexId());
             if (indexer != null) {
@@ -201,7 +172,6 @@ public class PlayerServlet extends HttpServlet {
         }
 
         if (!errors.isEmpty()) {
-            // Validation failed - return to form with errors
             request.setAttribute("errors", errors);
             request.setAttribute("player", player);
             request.setAttribute("indexers", indexerDAO.findAll());
@@ -209,11 +179,9 @@ public class PlayerServlet extends HttpServlet {
             return;
         }
 
-        // Insert player
         int newId = playerDAO.insert(player);
 
         if (newId > 0) {
-            // If index and value are provided, also insert into player_index
             if (player.getIndexId() != null && player.getIndexValue() != null) {
                 PlayerIndex playerIndex = new PlayerIndex();
                 playerIndex.setPlayerId(newId);
@@ -229,35 +197,25 @@ public class PlayerServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/player?action=list");
     }
 
-    /**
-     * Update existing player with validation
-     */
     private void updatePlayer(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Extract form data
         Player player = extractPlayerFromRequest(request);
         player.setPlayerId(ValidationUtil.parseIntSafe(request.getParameter("playerId"), 0));
 
-        // Get index value from form
         int indexValue = ValidationUtil.parseIntSafe(request.getParameter("indexValue"), 0);
         player.setIndexValue(indexValue > 0 ? indexValue : null);
 
-        // Server-side validation
         List<String> errors = ValidationUtil.validatePlayer(player);
 
-        // Validate age is numeric
         String ageStr = request.getParameter("age");
         if (!ValidationUtil.isValidInteger(ageStr)) {
             errors.add("Age must be a valid number");
         }
 
-        // Validate player ID
         if (player.getPlayerId() <= 0) {
             errors.add("Invalid player ID");
         }
 
-        // Validate index value if index is selected
         if (player.getIndexId() != null && player.getIndexId() > 0) {
             Indexer indexer = indexerDAO.findById(player.getIndexId());
             if (indexer != null) {
@@ -270,7 +228,6 @@ public class PlayerServlet extends HttpServlet {
         }
 
         if (!errors.isEmpty()) {
-            // Validation failed - return to form with errors
             request.setAttribute("errors", errors);
             request.setAttribute("player", player);
             request.setAttribute("indexers", indexerDAO.findAll());
@@ -278,11 +235,9 @@ public class PlayerServlet extends HttpServlet {
             return;
         }
 
-        // Update player
         boolean success = playerDAO.update(player);
 
         if (success) {
-            // Update or insert player_index
             if (player.getIndexId() != null && player.getIndexValue() != null) {
                 PlayerIndex playerIndex = new PlayerIndex();
                 playerIndex.setPlayerId(player.getPlayerId());
@@ -298,12 +253,8 @@ public class PlayerServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/player?action=list");
     }
 
-    /**
-     * Delete player
-     */
     private void deletePlayer(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         int playerId = ValidationUtil.parseIntSafe(request.getParameter("id"), 0);
 
         if (playerId <= 0) {
@@ -320,9 +271,6 @@ public class PlayerServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/player?action=list");
     }
 
-    /**
-     * Extract Player object from request parameters
-     */
     private Player extractPlayerFromRequest(HttpServletRequest request) {
         Player player = new Player();
         player.setName(request.getParameter("name"));
@@ -337,4 +285,3 @@ public class PlayerServlet extends HttpServlet {
         return player;
     }
 }
-

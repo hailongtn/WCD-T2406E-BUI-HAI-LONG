@@ -100,7 +100,6 @@
 
         <a href="<%=request.getContextPath()%>/player?action=list" class="back-link">&larr; Back to List</a>
 
-        <!-- Validation Errors -->
         <% if (errors != null && !errors.isEmpty()) { %>
             <div class="error-box">
                 <strong>Please fix the following errors:</strong>
@@ -112,7 +111,6 @@
             </div>
         <% } %>
 
-        <!-- Player Form -->
         <form action="<%=request.getContextPath()%>/player" method="post">
             <input type="hidden" name="action" value="<%= isEdit ? "update" : "insert" %>">
             <% if (isEdit) { %>
