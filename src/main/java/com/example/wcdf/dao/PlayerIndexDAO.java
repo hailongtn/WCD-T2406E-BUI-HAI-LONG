@@ -203,6 +203,31 @@ public class PlayerIndexDAO {
     }
 
     /**
+     * Insert or update player index (upsert)
+     * Uses MySQL's ON DUPLICATE KEY UPDATE
+     * @param playerIndex PlayerIndex to insert/update
+     * @return true if successful
+     */
+    public boolean insertOrUpdate(PlayerIndex playerIndex) {
+        String sql = "INSERT INTO player_index (player_id, index_id, value) VALUES (?, ?, ?) " +
+                     "ON DUPLICATE KEY UPDATE value = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, playerIndex.getPlayerId());
+            stmt.setInt(2, playerIndex.getIndexId());
+            stmt.setInt(3, playerIndex.getValue());
+            stmt.setInt(4, playerIndex.getValue());
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
      * Delete all indexes for a player
      * @param playerId Player ID
      * @return Number of deleted records

@@ -175,6 +175,10 @@ public class PlayerServlet extends HttpServlet {
         // Extract form data
         Player player = extractPlayerFromRequest(request);
 
+        // Get index value from form
+        int indexValue = ValidationUtil.parseIntSafe(request.getParameter("indexValue"), 0);
+        player.setIndexValue(indexValue > 0 ? indexValue : null);
+
         // Server-side validation
         List<String> errors = ValidationUtil.validatePlayer(player);
 
@@ -182,6 +186,18 @@ public class PlayerServlet extends HttpServlet {
         String ageStr = request.getParameter("age");
         if (!ValidationUtil.isValidInteger(ageStr)) {
             errors.add("Age must be a valid number");
+        }
+
+        // Validate index value if index is selected
+        if (player.getIndexId() != null && player.getIndexId() > 0) {
+            Indexer indexer = indexerDAO.findById(player.getIndexId());
+            if (indexer != null) {
+                if (player.getIndexValue() == null || player.getIndexValue() == 0) {
+                    errors.add("Value is required when Index is selected");
+                } else if (player.getIndexValue() < indexer.getValueMin() || player.getIndexValue() > indexer.getValueMax()) {
+                    errors.add("Value must be between " + indexer.getValueMin() + " and " + indexer.getValueMax());
+                }
+            }
         }
 
         if (!errors.isEmpty()) {
@@ -197,6 +213,14 @@ public class PlayerServlet extends HttpServlet {
         int newId = playerDAO.insert(player);
 
         if (newId > 0) {
+            // If index and value are provided, also insert into player_index
+            if (player.getIndexId() != null && player.getIndexValue() != null) {
+                PlayerIndex playerIndex = new PlayerIndex();
+                playerIndex.setPlayerId(newId);
+                playerIndex.setIndexId(player.getIndexId());
+                playerIndex.setValue(player.getIndexValue());
+                playerIndexDAO.insert(playerIndex);
+            }
             request.getSession().setAttribute("successMessage", "Player added successfully!");
         } else {
             request.getSession().setAttribute("errorMessage", "Failed to add player");
@@ -215,6 +239,10 @@ public class PlayerServlet extends HttpServlet {
         Player player = extractPlayerFromRequest(request);
         player.setPlayerId(ValidationUtil.parseIntSafe(request.getParameter("playerId"), 0));
 
+        // Get index value from form
+        int indexValue = ValidationUtil.parseIntSafe(request.getParameter("indexValue"), 0);
+        player.setIndexValue(indexValue > 0 ? indexValue : null);
+
         // Server-side validation
         List<String> errors = ValidationUtil.validatePlayer(player);
 
@@ -227,6 +255,18 @@ public class PlayerServlet extends HttpServlet {
         // Validate player ID
         if (player.getPlayerId() <= 0) {
             errors.add("Invalid player ID");
+        }
+
+        // Validate index value if index is selected
+        if (player.getIndexId() != null && player.getIndexId() > 0) {
+            Indexer indexer = indexerDAO.findById(player.getIndexId());
+            if (indexer != null) {
+                if (player.getIndexValue() == null || player.getIndexValue() == 0) {
+                    errors.add("Value is required when Index is selected");
+                } else if (player.getIndexValue() < indexer.getValueMin() || player.getIndexValue() > indexer.getValueMax()) {
+                    errors.add("Value must be between " + indexer.getValueMin() + " and " + indexer.getValueMax());
+                }
+            }
         }
 
         if (!errors.isEmpty()) {
@@ -242,6 +282,14 @@ public class PlayerServlet extends HttpServlet {
         boolean success = playerDAO.update(player);
 
         if (success) {
+            // Update or insert player_index
+            if (player.getIndexId() != null && player.getIndexValue() != null) {
+                PlayerIndex playerIndex = new PlayerIndex();
+                playerIndex.setPlayerId(player.getPlayerId());
+                playerIndex.setIndexId(player.getIndexId());
+                playerIndex.setValue(player.getIndexValue());
+                playerIndexDAO.insertOrUpdate(playerIndex);
+            }
             request.getSession().setAttribute("successMessage", "Player updated successfully!");
         } else {
             request.getSession().setAttribute("errorMessage", "Failed to update player");
